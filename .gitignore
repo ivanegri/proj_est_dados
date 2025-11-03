@@ -1,0 +1,20 @@
+# Arquivos de ambiente - Contêm segredos!
+.env
+
+# Arquivos com credenciais hardcoded
+API_spotify.py
+
+# Versões antigas/depreciadas dos scripts
+API_spotify_Pop_V1.py
+API_spotify_tracks_V1.py
+API_spotify_Pop_V2.py
+API_spotify_V2.py
+# Arquivos de dados gerados pelos scripts
+*.csv
+# Cache e artefatos do Python
+__pycache__/
+*.pyc
+
+# Pastas de ambiente virtual
+venv/
+.venv/
