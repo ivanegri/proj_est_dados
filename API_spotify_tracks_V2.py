@@ -26,8 +26,11 @@ import string
 import base64
 import argparse
 import requests
+import logging
 import pandas as pd
+from tqdm import tqdm
 from dotenv import load_dotenv
+
 
 
 # =================== AUTH ===================
@@ -155,7 +158,6 @@ def search_albums_by_year(
     limit: int = 50,
     shards=None,
     max_pages_per_shard=None,
-    verbose: bool = True,
 ):
     """
     Usa /v1/search?type=album com 'sharding' em artist:<shard> para aumentar recall.
@@ -167,7 +169,11 @@ def search_albums_by_year(
     headers = {"Authorization": f"Bearer {tok}"}
     albums_index = {}
 
-    for shard in shards:
+    shard_iterator = tqdm(
+        shards, desc=f"Searching albums for {year} in {market}", unit="shard"
+    )
+
+    for shard in shard_iterator:
         next_url = "https://api.spotify.com/v1/search"
         params = {
             "q": f"year:{year} artist:{shard}",
@@ -208,8 +214,7 @@ def search_albums_by_year(
             if max_pages_per_shard and pages >= max_pages_per_shard:
                 break
 
-        if verbose:
-            print(f"[{year} | {market}] shard '{shard}': {len(albums_index)} álbuns acumulados")
+        shard_iterator.set_postfix(found=len(albums_index))
 
     return albums_index
 
@@ -241,21 +246,20 @@ def collect_year_tracks(
     max_pages_per_shard=None,
     enrich_artists: bool = True,
     enrich_track_popularity: bool = True,
-    verbose: bool = True,
 ):
     """
     Retorna DataFrame com faixas únicas lançadas no ano, com colunas básicas + enriquecimentos.
     """
     albums_index = search_albums_by_year(
-        tok, year, market=market, shards=shards, max_pages_per_shard=max_pages_per_shard, verbose=verbose
+        tok, year, market=market, shards=shards, max_pages_per_shard=max_pages_per_shard
     )
-    if verbose:
-        print(f"[{year} | {market}] Álbuns únicos encontrados: {len(albums_index)}")
+    logging.info(f"[{year} | {market}] Found {len(albums_index)} unique albums.")
 
     rows = []
     all_artist_ids = set()
 
-    for idx, (album_id, alb) in enumerate(albums_index.items(), start=1):
+    album_iterator = tqdm(albums_index.items(), desc=f"Fetching tracks for {year} in {market}", unit="album")
+    for album_id, alb in album_iterator:
         trks = fetch_album_tracks(tok, album_id, market=market)
         for t in trks:
             artist_objs = t.get("artists") or []
@@ -280,9 +284,6 @@ def collect_year_tracks(
                 "spotify_url": (t.get("external_urls") or {}).get("spotify"),
             })
             all_artist_ids.update([aid for aid in artist_ids if aid])
-
-        if verbose and idx % 50 == 0:
-            print(f"[{year} | {market}] Processados {idx}/{len(albums_index)} álbuns…")
 
     df = pd.DataFrame(rows).drop_duplicates(subset=["track_id"]).reset_index(drop=True)
 
@@ -341,12 +342,19 @@ def main():
         raise RuntimeError("Defina SPOTIFY_CLIENT_ID e SPOTIFY_CLIENT_SECRET no ambiente (.env).")
 
     args = parse_args()
+
+    logging.basicConfig(
+        level=logging.INFO if args.verbose else logging.WARNING,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     tok = get_access_token(client_id, client_secret)
 
     shards = build_shards(args.shards)
-    for year in args.years:
+    for year in tqdm(args.years, desc="Processing years", unit="year"):
         dfs = []
-        for market in args.markets:
+        for market in tqdm(args.markets, desc=f"Processing markets for {year}", unit="market", leave=False):
             df_market = collect_year_tracks(
                 tok,
                 year,
@@ -355,7 +363,6 @@ def main():
                 max_pages_per_shard=args.max_pages_per_shard,
                 enrich_artists=(not args.no_enrich_artists),
                 enrich_track_popularity=(not args.no_enrich_track_pop),
-                verbose=args.verbose,
             )
             dfs.append(df_market)
 
@@ -365,9 +372,11 @@ def main():
         else:
             df_year = pd.DataFrame()
 
-        outpath = f"/raw_data/{args.outfile_prefix}_{year}.csv"
+        outdir = "raw_data"
+        os.makedirs(outdir, exist_ok=True)
+        outpath = os.path.join(outdir, f"{args.outfile_prefix}_{year}.csv")
         df_year.to_csv(outpath, index=False)
-        print(f"[{year}] Tracks únicas: {len(df_year)} | CSV salvo: {outpath}")
+        logging.info(f"[{year}] Unique tracks: {len(df_year)} | CSV saved to: {outpath}")
 
 
 if __name__ == "__main__":
