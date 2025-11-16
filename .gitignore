@@ -9,6 +9,7 @@ API_spotify_Pop_V1.py
 API_spotify_tracks_V1.py
 API_spotify_Pop_V2.py
 API_spotify_V2.py
+API_spotify_tracks_V2.py
 # Arquivos de dados gerados pelos scripts
 *.csv
 # Cache e artefatos do Python
