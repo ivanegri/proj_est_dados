@@ -64,6 +64,7 @@ O dashboard foi desenhado para responder a 4 perguntas de negócio principais:
 
 ### 2. Análise de Tendências
 *Gráficos que comprovam a queda na duração média das músicas entre 2020 e 2024.*
+![Análise Temporal](print_analise.png)
 
 
 ### 3. Exploração de Dados
