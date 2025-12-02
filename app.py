@@ -5,9 +5,10 @@ import plotly.graph_objects as go
 import glob
 import os
 from collections import Counter
+import numpy as np
 
 # ==============================================================================
-# 1. CONFIGURAÇÃO GERAL E ESTILIZAÇÃO
+# 1. CONFIGURAÇÃO GERAL E ESTILIZAÇAO
 # ==============================================================================
 st.set_page_config(
     page_title="Spotify Data Analytics | Fatec",
@@ -16,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Paleta de Cores Personalizada (Spotify Dark Theme)
+# Paleta de Cores Personalizada (Spotifi Dark Theme)
 COLOR_SPOTIFY_GREEN = "#1DB954"
 COLOR_SPOTIFY_BLACK = "#191414"
 COLOR_SPOTIFY_WHITE = "#FFFFFF"
@@ -24,7 +25,7 @@ COLOR_ACCENT_RED = "#E91429"
 COLOR_ACCENT_BLUE = "#1E90FF"
 COLOR_ACCENT_YELLOW = "#FFD700"
 
-# CSS para injetar estilo profissional
+# CSS 
 st.markdown("""
     <style>
         .block-container {padding-top: 1.5rem; padding-bottom: 3rem;}
@@ -114,13 +115,13 @@ def load_and_process_data():
         else:
             df[col] = default_val
 
-    # 4. Extração de Gêneros (NOVO!)
+    # 4. Extração de Gêneros 
     if 'primary_artist_genres' in df.columns:
         df['main_genre'] = df['primary_artist_genres'].apply(extract_main_genre)
     else:
         df['main_genre'] = 'Outros'
 
-    # 5. Classificação por Popularidade (NOVO!)
+    # 5. Classificação por Popularidade 
     df['popularity_tier'] = pd.cut(
         df['track_popularity'], 
         bins=[0, 30, 60, 100], 
@@ -589,8 +590,6 @@ def main():
                 st.metric("Anos Cobertos", f"{df_filtered['year'].min()} - {df_filtered['year'].max()}")
                 st.metric("Período", f"{df_filtered['year'].nunique()} anos")
 
-# ✅ IMPORTAÇÃO DO NUMPY (necessário para linha de tendência)
-import numpy as np
 
 # Execução Principal
 if __name__ == "__main__":
