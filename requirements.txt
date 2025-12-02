@@ -4,3 +4,4 @@ python-dotenv
 tqdm
 spotipy
 streamlit
+plotly

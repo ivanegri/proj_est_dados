@@ -1,21 +1,17 @@
-# Arquivos de ambiente - Contêm segredos!
+# --- SEGURANÇA (Obrigatório) ---
 .env
+.DS_Store
 
-# Arquivos com credenciais hardcoded
-API_spotify.py
-
-# Versões antigas/depreciadas dos scripts
-API_spotify_Pop_V1.py
-API_spotify_tracks_V1.py
-API_spotify_Pop_V2.py
-API_spotify_V2.py
-API_spotify_tracks_V2.py
-# Arquivos de dados gerados pelos scripts
-*.csv
-# Cache e artefatos do Python
+# --- AMBIENTE PYTHON ---
 __pycache__/
 *.pyc
-
-# Pastas de ambiente virtual
 venv/
 .venv/
+env/
+
+# --- ARQUIVOS TEMPORÁRIOS DO VS CODE ---
+.vscode/
+
+# --- NOTA IMPORTANTE ---
+# Não estamos ignorando os .csv nem o script V2 
+# porque eles fazem parte da entrega final!
