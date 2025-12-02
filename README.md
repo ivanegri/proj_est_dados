@@ -9,7 +9,7 @@ Markdown
 
 ## 📌 Sobre o Projeto
 
-Este projeto foi desenvolvido como Trabalho de Conclusão da disciplina de **Estrutura de Dados e Big Data** da **Fatec Jundiaí**.
+Este projeto foi desenvolvido como Trabalho de Conclusão da disciplina de **Estrutura de Dados** da **Fatec Jundiaí**.
 
 O objetivo foi criar uma solução completa de Ciência de Dados (End-to-End) que coleta, processa e visualiza dados reais do Spotify para analisar a evolução do mercado musical brasileiro nos últimos 5 anos. O dashboard responde a perguntas estratégicas sobre o comportamento de consumo, como a redução da duração das músicas ("Efeito TikTok") e a predominância de gêneros nacionais.
 
